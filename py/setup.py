@@ -1,3 +1,4 @@
+from subprocess import call
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from os.path import expanduser
@@ -25,8 +26,8 @@ class get_pybind_include(object):
 
 sources = list(chain(
     glob('*.cpp'),
-    glob('../replayer/*.cpp'),
-    glob('../client/*.cpp'),
+    # glob('../replayer/*.cpp'),
+    # glob('../client/*.cpp'),
 ))
 print(sources)
 
@@ -46,8 +47,9 @@ ext_modules = [
         # TODO Search for ZSTD and define this if it exists
         define_macros=[('WITH_ZSTD', None)],
         # TODO Dynamically search for this somehow???
-        library_dirs=[expanduser("~/torch/install/lib")],
-        libraries=['TH', 'zstd', 'zmq'],
+        # library_dirs=[expanduser("~/torch/install/lib")],
+        library_dirs=glob("../build"),
+        libraries=['torchcraft', 'zstd', 'zmq'],
         language='c++'
     ),
 ]
@@ -63,6 +65,11 @@ class BuildExt(build_ext):
         c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
 
     def build_extensions(self):
+        ret = call("(cd ..; mkdir -p build && cd build && cmake .. && make)",
+                   shell=True)
+        if ret != 0:
+            print("Could not build torchcraft")
+            return 1
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
         if ct == 'unix':
