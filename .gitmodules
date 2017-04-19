@@ -4,3 +4,6 @@
 [submodule "BWEnv/include/czmq"]
 	path = BWEnv/include/czmq
 	url = https://github.com/torchcraft/czmq
+[submodule "BWEnv/tsc-bw"]
+	path = BWEnv/tsc-bw
+	url = https://github.com/tscmoo/tsc-bw.git
